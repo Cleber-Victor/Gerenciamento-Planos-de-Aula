@@ -37,7 +37,7 @@ async function generateRecommendations({ title, discipline, summary }) {
     }
 
     const genAI = new GoogleGenerativeAI(config.geminiApiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
     const result = await model.generateContent(prompt);
     const response = result.response;
