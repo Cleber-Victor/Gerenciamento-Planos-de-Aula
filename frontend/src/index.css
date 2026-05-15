@@ -639,6 +639,69 @@ a {
   }
 }
 
+/* --- List Input (conteúdos, recursos) --- */
+.list-input {
+  display: flex;
+  gap: 8px;
+}
+
+.list-input input {
+  flex: 1;
+}
+
+.add-btn {
+  padding: 10px 16px !important;
+  font-size: 1.1rem !important;
+}
+
+.list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.list-item button {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.list-item button:hover {
+  opacity: 1;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-left: 4px;
+  padding: 0;
+}
+
+.tag-remove:hover {
+  color: var(--color-danger);
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   .header-content {
