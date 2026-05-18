@@ -1,7 +1,6 @@
 const { query } = require('../db/connection');
 const logger = require('../utils/logger');
 
-
 async function create(data) {
   const result = await query(
     `INSERT INTO lesson_plans (title, objective, summary, scheduled_date, discipline, contents, support_resources, tags)
@@ -22,7 +21,6 @@ async function create(data) {
   logger.info('Plano de aula criado', { id: result.rows[0].id, title: data.title });
   return result.rows[0];
 }
-
 
 async function findById(id) {
   const result = await query('SELECT * FROM lesson_plans WHERE id = $1', [id]);
@@ -72,7 +70,6 @@ async function findAll(filters) {
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-
   const sortBy = filters.sort_by === 'title' ? 'title' : 'created_at';
   const sortOrder = filters.sort_order === 'asc' ? 'ASC' : 'DESC';
 
@@ -106,9 +103,7 @@ async function findAll(filters) {
   };
 }
 
-
 async function update(id, data) {
-
   const fields = [];
   const params = [];
   let paramIndex = 1;
@@ -137,7 +132,6 @@ async function update(id, data) {
     return findById(id);
   }
 
-
   fields.push(`updated_at = NOW()`);
 
   const result = await query(
@@ -152,7 +146,6 @@ async function update(id, data) {
   logger.info('Plano de aula atualizado', { id, fields: Object.keys(data) });
   return result.rows[0];
 }
-
 
 async function remove(id) {
   const result = await query('DELETE FROM lesson_plans WHERE id = $1 RETURNING id', [id]);

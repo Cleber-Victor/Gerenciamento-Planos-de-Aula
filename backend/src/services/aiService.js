@@ -26,8 +26,7 @@ Regras:
 async function generateRecommendations({ title, discipline, summary }) {
   const startTime = Date.now();
 
-  const prompt = PROMPT_TEMPLATE
-    .replace('{title}', title)
+  const prompt = PROMPT_TEMPLATE.replace('{title}', title)
     .replace('{discipline}', discipline)
     .replace('{summary}', summary);
 
@@ -44,7 +43,10 @@ async function generateRecommendations({ title, discipline, summary }) {
     const text = response.text();
 
     // Remove marcadores de código (```json ... ```) se existirem
-    const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const cleanText = text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
 
     const parsed = JSON.parse(cleanText);
 
