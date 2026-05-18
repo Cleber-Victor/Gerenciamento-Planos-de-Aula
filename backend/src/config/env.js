@@ -9,7 +9,6 @@ if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
 }
 
-
 const config = {
   port: parseInt(process.env.PORT, 10) || 3001,
 
