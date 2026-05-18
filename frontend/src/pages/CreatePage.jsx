@@ -2,12 +2,30 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createLessonPlan, generateSmartAssist } from '../api/client.js';
 
+// Regras de mínimo de caracteres (sincronizadas com o backend)
+const MIN_LENGTHS = {
+  title: 3,
+  discipline: 2,
+  summary: 4,
+  objective: 4,
+};
+
+function getFieldError(name, value) {
+  const min = MIN_LENGTHS[name];
+  if (!min) return null;
+  if (value.length > 0 && value.length < min) {
+    return `Mínimo de ${min} caracteres (${value.length}/${min})`;
+  }
+  return null;
+}
+
 function CreatePage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [touched, setTouched] = useState({});
 
   const [form, setForm] = useState({
     title: '',
@@ -28,6 +46,12 @@ function CreatePage() {
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  }
+
+  function handleBlur(e) {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
   }
 
   // Adiciona item a uma lista (contents, support_resources, tags)
@@ -94,6 +118,34 @@ function CreatePage() {
     }
   }
 
+  // Helper para renderizar um campo com validação visual
+  function renderField(name, label, placeholder, isTextarea = false) {
+    const fieldError = touched[name] ? getFieldError(name, form[name]) : null;
+    const isValid = touched[name] && form[name].length >= (MIN_LENGTHS[name] || 0) && form[name].length > 0;
+    const InputTag = isTextarea ? 'textarea' : 'input';
+
+    return (
+      <div className={`form-group ${fieldError ? 'has-error' : ''} ${isValid ? 'is-valid' : ''}`}>
+        <label htmlFor={name}>{label} *</label>
+        <InputTag
+          id={name}
+          name={name}
+          type={isTextarea ? undefined : 'text'}
+          placeholder={placeholder}
+          value={form[name]}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          required
+          className={fieldError ? 'input-error' : isValid ? 'input-valid' : ''}
+        />
+        {fieldError && <span className="field-error">{fieldError}</span>}
+        {!fieldError && MIN_LENGTHS[name] && touched[name] && !isValid && form[name].length === 0 && (
+          <span className="field-hint">Mínimo de {MIN_LENGTHS[name]} caracteres</span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="form-container">
       <div className="page-header">
@@ -106,46 +158,9 @@ function CreatePage() {
 
       <div className="form-card">
         <form onSubmit={handleSubmit}>
-          {/* Título */}
-          <div className="form-group">
-            <label htmlFor="title">Título da Aula *</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              placeholder="Ex: Introdução ao Protocolo OSPF"
-              value={form.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Disciplina */}
-          <div className="form-group">
-            <label htmlFor="discipline">Disciplina *</label>
-            <input
-              id="discipline"
-              name="discipline"
-              type="text"
-              placeholder="Ex: Redes de Computadores"
-              value={form.discipline}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Ementa/Resumo */}
-          <div className="form-group">
-            <label htmlFor="summary">Ementa / Resumo *</label>
-            <textarea
-              id="summary"
-              name="summary"
-              placeholder="Descreva brevemente o conteúdo da aula..."
-              value={form.summary}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {renderField('title', 'Título da Aula', 'Ex: Introdução ao Protocolo OSPF')}
+          {renderField('discipline', 'Disciplina', 'Ex: Redes de Computadores')}
+          {renderField('summary', 'Ementa / Resumo', 'Descreva brevemente o conteúdo da aula...', true)}
 
           {/* Botão Smart Assist */}
           <button
@@ -157,18 +172,7 @@ function CreatePage() {
             {aiLoading ? '⏳ Gerando recomendações com IA...' : '✨ Gerar Recomendações com IA'}
           </button>
 
-          {/* Objetivo */}
-          <div className="form-group">
-            <label htmlFor="objective">Objetivo *</label>
-            <textarea
-              id="objective"
-              name="objective"
-              placeholder="O que o aluno deve aprender ao final da aula?"
-              value={form.objective}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {renderField('objective', 'Objetivo', 'O que o aluno deve aprender ao final da aula?', true)}
 
           {/* Data Prevista */}
           <div className="form-group">

@@ -1,7 +1,14 @@
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+// Em desenvolvimento local, carrega o .env da raiz do projeto.
+// Em Docker, as variáveis são injetadas pelo docker-compose.
+const envPath = path.resolve(__dirname, '../../../.env');
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
+
 
 const config = {
   port: parseInt(process.env.PORT, 10) || 3001,

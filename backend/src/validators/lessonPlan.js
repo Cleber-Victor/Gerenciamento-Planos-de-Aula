@@ -8,10 +8,10 @@ const createLessonPlanSchema = z.object({
     .max(255, 'Título deve ter no máximo 255 caracteres'),
   objective: z
     .string({ required_error: 'Objetivo é obrigatório' })
-    .min(10, 'Objetivo deve ter no mínimo 10 caracteres'),
+    .min(4, 'Objetivo deve ter no mínimo 4 caracteres'),
   summary: z
     .string({ required_error: 'Ementa/Resumo é obrigatório' })
-    .min(10, 'Ementa deve ter no mínimo 10 caracteres'),
+    .min(4, 'Ementa deve ter no mínimo 4 caracteres'),
   scheduled_date: z
     .string({ required_error: 'Data prevista é obrigatória' })
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve estar no formato YYYY-MM-DD'),
@@ -37,7 +37,7 @@ const smartAssistSchema = z.object({
     .min(2, 'Disciplina deve ter no mínimo 2 caracteres'),
   summary: z
     .string({ required_error: 'Ementa é obrigatória para gerar recomendações' })
-    .min(10, 'Ementa deve ter no mínimo 10 caracteres'),
+    .min(4, 'Ementa deve ter no mínimo 4 caracteres'),
 });
 
 // Valida os filtros da listagem

@@ -468,6 +468,59 @@ a {
   margin-top: 4px;
 }
 
+/* --- Field Validation States --- */
+.form-group.has-error input,
+.form-group.has-error textarea {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  animation: shake 0.3s ease;
+}
+
+.form-group.has-error label {
+  color: var(--color-danger);
+}
+
+.form-group.is-valid input,
+.form-group.is-valid textarea {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.field-error {
+  display: block;
+  color: var(--color-danger);
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-top: 6px;
+  animation: fade-in 0.2s ease;
+}
+
+.field-hint {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-top: 6px;
+}
+
+.input-error {
+  border-color: var(--color-danger) !important;
+}
+
+.input-valid {
+  border-color: var(--color-success) !important;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .form-actions {
   display: flex;
   gap: 12px;

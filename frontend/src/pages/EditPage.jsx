@@ -2,6 +2,23 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchLessonPlan, updateLessonPlan, generateSmartAssist } from '../api/client.js';
 
+// Regras de mínimo de caracteres (sincronizadas com o backend)
+const MIN_LENGTHS = {
+  title: 3,
+  discipline: 2,
+  summary: 4,
+  objective: 4,
+};
+
+function getFieldError(name, value) {
+  const min = MIN_LENGTHS[name];
+  if (!min) return null;
+  if (value.length > 0 && value.length < min) {
+    return `Mínimo de ${min} caracteres (${value.length}/${min})`;
+  }
+  return null;
+}
+
 function EditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -10,6 +27,7 @@ function EditPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [touched, setTouched] = useState({});
 
   const [form, setForm] = useState({
     title: '',
@@ -52,6 +70,12 @@ function EditPage() {
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  }
+
+  function handleBlur(e) {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
   }
 
   function addToList(field, value, setter) {
@@ -114,6 +138,34 @@ function EditPage() {
     }
   }
 
+  // Helper para renderizar um campo com validação visual
+  function renderField(name, label, placeholder, isTextarea = false) {
+    const fieldError = touched[name] ? getFieldError(name, form[name]) : null;
+    const isValid = touched[name] && form[name].length >= (MIN_LENGTHS[name] || 0) && form[name].length > 0;
+    const InputTag = isTextarea ? 'textarea' : 'input';
+
+    return (
+      <div className={`form-group ${fieldError ? 'has-error' : ''} ${isValid ? 'is-valid' : ''}`}>
+        <label htmlFor={name}>{label} *</label>
+        <InputTag
+          id={name}
+          name={name}
+          type={isTextarea ? undefined : 'text'}
+          placeholder={placeholder}
+          value={form[name]}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          required
+          className={fieldError ? 'input-error' : isValid ? 'input-valid' : ''}
+        />
+        {fieldError && <span className="field-error">{fieldError}</span>}
+        {!fieldError && MIN_LENGTHS[name] && touched[name] && !isValid && form[name].length === 0 && (
+          <span className="field-hint">Mínimo de {MIN_LENGTHS[name]} caracteres</span>
+        )}
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="loading-state">
@@ -135,40 +187,9 @@ function EditPage() {
 
       <div className="form-card">
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="title">Título da Aula *</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              value={form.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="discipline">Disciplina *</label>
-            <input
-              id="discipline"
-              name="discipline"
-              type="text"
-              value={form.discipline}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="summary">Ementa / Resumo *</label>
-            <textarea
-              id="summary"
-              name="summary"
-              value={form.summary}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {renderField('title', 'Título da Aula', 'Ex: Introdução ao Protocolo OSPF')}
+          {renderField('discipline', 'Disciplina', 'Ex: Redes de Computadores')}
+          {renderField('summary', 'Ementa / Resumo', 'Descreva brevemente o conteúdo da aula...', true)}
 
           <button
             type="button"
@@ -179,16 +200,7 @@ function EditPage() {
             {aiLoading ? '⏳ Gerando recomendações com IA...' : '✨ Gerar Recomendações com IA'}
           </button>
 
-          <div className="form-group">
-            <label htmlFor="objective">Objetivo *</label>
-            <textarea
-              id="objective"
-              name="objective"
-              value={form.objective}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {renderField('objective', 'Objetivo', 'O que o aluno deve aprender ao final da aula?', true)}
 
           <div className="form-group">
             <label htmlFor="scheduled_date">Data Prevista *</label>
